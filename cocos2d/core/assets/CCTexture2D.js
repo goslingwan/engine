@@ -322,6 +322,8 @@ var Texture2D = cc.Class({
         _wrapS: WrapMode.CLAMP_TO_EDGE,
         _wrapT: WrapMode.CLAMP_TO_EDGE,
 
+        _isAlphaAtlas: false,
+
         _genMipmaps: false,
         /**
          * !#en Sets whether generate mipmaps for the texture
@@ -575,6 +577,7 @@ var Texture2D = cc.Class({
         this.width = pixelsWidth;
         this.height = pixelsHeight;
 
+        this._updateFormat();
         this._checkPackable();
 
         this.loaded = true;
@@ -641,6 +644,10 @@ var Texture2D = cc.Class({
         return this._premultiplyAlpha || false;
     },
 
+    isAlphaAtlas () {
+        return this._isAlphaAtlas;
+    },
+
     /**
      * !#en
      * Handler of texture loaded event.
@@ -677,6 +684,7 @@ var Texture2D = cc.Class({
             this._texture.update(opts);
         }
 
+        this._updateFormat();
         this._checkPackable();
 
         //dispatch load event to listener.
@@ -772,6 +780,13 @@ var Texture2D = cc.Class({
             var opts = _getSharedOptions();
             opts.premultiplyAlpha = premultiply;
             this.update(opts);
+        }
+    },
+
+    _updateFormat () {
+        this._isAlphaAtlas = this._format === PixelFormat.RGBA_ETC1 || this._format === PixelFormat.RGB_A_PVRTC_4BPPV1 || this._format === PixelFormat.RGB_A_PVRTC_2BPPV1;
+        if (CC_JSB) {
+            this._texture.setAlphaAtlas(this._isAlphaAtlas);
         }
     },
 
